@@ -1,6 +1,6 @@
-<h2>Files d'attente <mat-form-field style="margin-left: 10px; font-size: 15px; width: 250px;">
-        <mat-label>Nouvelle file d'attente</mat-label>
-        <input matInput placeholder="Nom de la file d'attente" [(ngModel)]="newQueueName">
+<h2>{{ 'admin.queues' | translate }} <mat-form-field style="margin-left: 10px; font-size: 15px; width: 250px;">
+        <mat-label>{{ 'admin.newQueue' | translate }}</mat-label>
+        <input matInput [placeholder]="'admin.queueNamePlaceholder' | translate" [(ngModel)]="newQueueName">
     </mat-form-field>
     <button (click)="createQueue()" mat-button>
         <mat-icon style="color: green;">add_box</mat-icon>
@@ -11,8 +11,8 @@
 <div class="field-container">
 
     <mat-form-field style="margin-left: 10px;">
-        <mat-label>Chercher</mat-label>
-        <input matInput (keyup)="applyFilter($event)" placeholder="Chercher par nom">
+        <mat-label>{{ 'admin.search' | translate }}</mat-label>
+        <input matInput (keyup)="applyFilter($event)" [placeholder]="'admin.searchByName' | translate">
     </mat-form-field>
 </div>
 <div class="mat-elevation-z8">
@@ -32,7 +32,7 @@
         </ng-container>
         <!-- Position Column -->
         <ng-container matColumnDef="name">
-            <th mat-header-row *matHeaderCellDef>Nom</th>
+            <th mat-header-row *matHeaderCellDef>{{ 'admin.queueName' | translate }}</th>
             <td mat-cell *matCellDef="let element">{{ element.name }}</td>
         </ng-container>
 

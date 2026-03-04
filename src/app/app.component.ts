@@ -2,6 +2,7 @@ import { AuthService } from './auth/auth.service';
 import { Component, OnInit } from '@angular/core';
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
+import { TranslateService } from '@ngx-translate/core';
 import { User } from './types/user';
 
 @Component({
@@ -14,7 +15,14 @@ export class AppComponent implements OnInit {
 
   currentUser: User;
 
-  constructor(iconRegistry: MatIconRegistry, sanitizer: DomSanitizer, private authService: AuthService) {
+  constructor(
+    iconRegistry: MatIconRegistry,
+    sanitizer: DomSanitizer,
+    private authService: AuthService,
+    private translate: TranslateService,
+  ) {
+    translate.setDefaultLang('en');
+    translate.use('en');
     iconRegistry.addSvgIcon('dashboard', sanitizer.bypassSecurityTrustResourceUrl('assets/svg/icon-dashboard.svg'));
     iconRegistry.addSvgIcon('queue', sanitizer.bypassSecurityTrustResourceUrl('assets/svg/icon-queue.svg'));
     iconRegistry.addSvgIcon('server', sanitizer.bypassSecurityTrustResourceUrl('assets/svg/server.svg'));

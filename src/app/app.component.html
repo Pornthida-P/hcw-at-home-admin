@@ -4,7 +4,7 @@
 
 
     <mat-sidenav opened #sidenav mode="side" class="sidenav">
-      <div class="at">@ <span>HOME</span></div>
+      <div class="at">@ <span>{{ 'admin.home' | translate }}</span></div>
       <mat-list class="menu-list">
         <mat-list-item class="list-item">
           <button
@@ -14,7 +14,7 @@
             mat-button
           >
             <mat-icon svgIcon="dashboard"></mat-icon>
-            <span class="btn-text">Dashboard</span>
+            <span class="btn-text">{{ 'admin.dashboard' | translate }}</span>
           </button>
         </mat-list-item>
 
@@ -26,7 +26,7 @@
             mat-button
           >
             <mat-icon>supervised_user_circle</mat-icon>
-            <span class="btn-text">Users</span>
+            <span class="btn-text">{{ 'admin.users' | translate }}</span>
           </button>
         </mat-list-item>
         <mat-list-item class="list-item">
@@ -37,7 +37,7 @@
             mat-button
           >
             <mat-icon>supervised_user_circle</mat-icon>
-            <span class="btn-text">Requester</span>
+            <span class="btn-text">{{ 'admin.requester' | translate }}</span>
           </button>
         </mat-list-item>
 
@@ -49,7 +49,7 @@
             mat-button
           >
             <mat-icon svgIcon="queue"></mat-icon>
-            <span class="btn-text">Waiting queues</span>
+            <span class="btn-text">{{ 'admin.waitingQueues' | translate }}</span>
           </button>
         </mat-list-item>
         <mat-list-item class="list-item">
@@ -60,7 +60,7 @@
             mat-button
           >
             <mat-icon svgIcon="server"></mat-icon>
-            <span class="btn-text">Mediasoup</span>
+            <span class="btn-text">{{ 'admin.mediasoup' | translate }}</span>
           </button>
         </mat-list-item>
       </mat-list>

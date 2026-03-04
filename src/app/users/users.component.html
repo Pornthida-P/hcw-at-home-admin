@@ -1,5 +1,5 @@
 <h2>
-  Users <button mat-raised-button color="primary" [routerLink]="['/new-user']">Add new user</button>
+  {{ 'admin.users' | translate }} <button mat-raised-button color="primary" [routerLink]="['/new-user']">{{ 'admin.addNewUser' | translate }}</button>
 </h2>
 
 <mat-spinner *ngIf="loading"></mat-spinner>
@@ -15,38 +15,38 @@
     </select>
   </mat-form-field-->
   <mat-form-field style="margin-left: 10px;">
-    <mat-label>Chercher</mat-label>
-    <input matInput (keyup)="applyFilter($event)" placeholder="Nom, Prénom, email..." />
+    <mat-label>{{ 'admin.search' | translate }}</mat-label>
+    <input matInput (keyup)="applyFilter($event)" [placeholder]="'admin.searchPlaceholder' | translate" />
   </mat-form-field>
 </div>
 <div class="mat-elevation-z8">
   <table mat-table [dataSource]="dataSource">
     <!-- Position Column -->
     <ng-container matColumnDef="position">
-      <th mat-header-cell *matHeaderCellDef>No.</th>
+      <th mat-header-cell *matHeaderCellDef>{{ 'admin.no' | translate }}</th>
       <td mat-cell *matCellDef="let element">{{ element.position }}</td>
     </ng-container>
 
     <!-- Name Column -->
     <ng-container matColumnDef="email">
-      <th mat-header-cell *matHeaderCellDef>Email</th>
-      <td mat-cell *matCellDef="let element">{{ element.email || 'Unknown' }}</td>
+      <th mat-header-cell *matHeaderCellDef>{{ 'admin.email' | translate }}</th>
+      <td mat-cell *matCellDef="let element">{{ element.email || ('admin.unknown' | translate) }}</td>
     </ng-container>
 
     <!-- Name Column -->
     <ng-container matColumnDef="name">
-      <th mat-header-cell *matHeaderCellDef>Name</th>
+      <th mat-header-cell *matHeaderCellDef>{{ 'admin.name' | translate }}</th>
       <td mat-cell *matCellDef="let element">{{ element.firstName + ' ' + element.lastName }}</td>
     </ng-container>
 
     <!-- Symbol Column -->
     <ng-container matColumnDef="role">
-      <th mat-header-cell *matHeaderCellDef>Role</th>
+      <th mat-header-cell *matHeaderCellDef>{{ 'admin.role' | translate }}</th>
       <td mat-cell *matCellDef="let element">{{ element.role }}</td>
     </ng-container>
 
     <ng-container matColumnDef="action">
-      <th mat-header-cell *matHeaderCellDef style="width:130px;">Action</th>
+      <th mat-header-cell *matHeaderCellDef style="width:130px;">{{ 'admin.action' | translate }}</th>
       <td mat-cell *matCellDef="let element">
         <button (click)="selectUser(element)" mat-button>
           <mat-icon style="color:#2871BD">edit</mat-icon>

@@ -15,7 +15,7 @@
           width: 28px;"
         svgIcon="stat"
       ></mat-icon>
-      Admin {{ currentUser.firstName + " " + currentUser.lastName }}
+      {{ 'admin.label' | translate }} {{ currentUser.firstName + " " + currentUser.lastName }}
       <div
         (click)="logout()"
         style="position: absolute;    bottom: -100%;         left: 0;     height: 70px; width: 100%; background: #E3393A; color: white;"
@@ -26,7 +26,7 @@
               width: 28px;"
           svgIcon="logout"
         ></mat-icon>
-        Logout
+        {{ 'admin.logout' | translate }}
       </div>
     </div>
   </div>
@@ -60,7 +60,7 @@
 >
   <div style="flex:1; ">
     <div style="height: 20%; font-size: 0.7em; color: rgb(146, 146, 146);">
-      Prénom et nom du patient
+      {{ 'chat.patientFirstnameAndLastname' | translate }}
     </div>
     <div
       style="height: 62%; font-size: 1em;    padding-top: 5px;
@@ -72,7 +72,7 @@
   </div>
   <div style="flex:1; ">
     <div style="height: 20%; font-size: 0.7em; color: rgb(146, 146, 146);">
-      Date de naissance du patient
+      {{ 'chat.patientBirthday' | translate }}
     </div>
     <div
       style="height: 62%; font-size: 1em;    padding-top: 5px;
@@ -81,19 +81,19 @@
       {{
         consultation.consultation.birthDate
           ? (consultation.consultation.birthDate | date: "d MMM yyyy")
-          : "None"
+          : ('admin.none' | translate)
       }}
     </div>
   </div>
   <div style="flex:1; ">
     <div style="height: 20%; font-size: 0.7em; color: rgb(146, 146, 146);">
-      Infirmier
+      {{ 'chat.nurse' | translate }}
     </div>
     <div
       style="height: 62%; font-size: 1em;    padding-top: 5px;
 "
     >
-      {{ consultation.nurse ? consultation.nurse.firstName + " " : "None"
+      {{ consultation.nurse ? consultation.nurse.firstName + " " : ('admin.none' | translate)
       }}{{
         consultation.nurse ? (consultation.nurse.lastName | uppercase) : ""
       }}
