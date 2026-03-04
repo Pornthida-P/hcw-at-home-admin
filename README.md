@@ -13,7 +13,7 @@ npm install
 npm start
 ```
 
-Then open **http://localhost:4200/**. The app will reload when you change source files.
+Then open **http://localhost:4202/**. The app will reload when you change source files.
 
 ## Build
 
