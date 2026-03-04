@@ -55,7 +55,10 @@
             <input [(ngModel)]="user.email" matInput [placeholder]="'admin.email' | translate" formControlName="emailFormControl"
                 [errorStateMatcher]="matcher" />
 
-            <mat-error *ngIf="myForm.controls.emailFormControl.hasError('email')">
+            <mat-error *ngIf="myForm.controls.emailFormControl.hasError('required')">
+                {{ 'admin.emailRequired' | translate }}
+            </mat-error>
+            <mat-error *ngIf="myForm.controls.emailFormControl.hasError('email') && !myForm.controls.emailFormControl.hasError('required')">
                 {{ 'login.pleaseProvideAValidEmail' | translate }}
             </mat-error>
         </mat-form-field>
@@ -66,6 +69,18 @@
 
             <mat-error *ngIf="myForm.controls.phoneNumberFormControl.hasError('pattern')">
                 {{ 'admin.phoneFormatError' | translate }}
+            </mat-error>
+        </mat-form-field>
+    </div>
+    <div *ngIf="!user?.id" class="field-container">
+        <mat-form-field>
+            <mat-label class="label">{{ 'admin.initialPassword' | translate }}</mat-label>
+            <input [(ngModel)]="initialPassword" type="password" matInput
+                [placeholder]="'admin.initialPasswordPlaceholder' | translate"
+                formControlName="initialPasswordFormControl" [errorStateMatcher]="matcher" />
+            <mat-hint>{{ 'admin.initialPasswordHint' | translate }}</mat-hint>
+            <mat-error *ngIf="myForm.controls.initialPasswordFormControl.hasError('minlength')">
+                {{ 'admin.initialPasswordMinLength' | translate }}
             </mat-error>
         </mat-form-field>
     </div>
@@ -102,7 +117,7 @@
         <button mat-button (click)="cancel()" type="button">
             {{ 'admin.cancel' | translate }}
         </button>
-        <button class="btn__send" [disabled]="loading" type="submit" mat-button>
+        <button class="btn__send" [disabled]="loading || !myForm?.valid" type="submit" mat-button>
             {{ 'admin.send' | translate }}
         </button>
     </div>

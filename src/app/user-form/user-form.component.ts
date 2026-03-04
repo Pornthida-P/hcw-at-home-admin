@@ -20,12 +20,13 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
 })
 export class UserFormComponent implements OnInit {
   @Input() user: User;
-  @Output() change: EventEmitter<User> = new EventEmitter<User>();
+  @Input() loading = false;
+  @Output() change: EventEmitter<{ user: User; initialPassword?: string }> = new EventEmitter<{ user: User; initialPassword?: string }>();
 
   myForm;
   matcher = new MyErrorStateMatcher();
-  loading = false;
   error = '';
+  initialPassword = '';
   constructor(private formBuilder: FormBuilder,
     private location: Location,
     private router: Router
@@ -53,8 +54,11 @@ export class UserFormComponent implements OnInit {
 
   createFormGroup() {
     this.user.role = Role.doctor;
+    const isNewUser = !this.user?.id;
     this.myForm = this.formBuilder.group({
-      emailFormControl: new FormControl(this.user.email, [Validators.email]),
+      emailFormControl: new FormControl(this.user.email, isNewUser
+        ? [Validators.required, Validators.email]
+        : [Validators.email]),
       phoneNumberFormControl: new FormControl(this.user.phoneNumber, [Validators.pattern(new RegExp(/^\+[0-9 ]+$/))]),
       firstNameFormControl: new FormControl(this.user.firstName, [Validators.required]),
       lastNameFormControl: new FormControl(this.user.lastName, [Validators.required]),
@@ -64,10 +68,7 @@ export class UserFormComponent implements OnInit {
       viewAllQueuesFormControl: new FormControl(this.user.viewAllQueues),
       authPhoneNumberFormControl: new FormControl(this.user.authPhoneNumber, [Validators.pattern(new RegExp(/^\+[0-9 ]+$/))]),
       genderFormControl: new FormControl(this.user.gender),
-
-      // genderFormControl: new FormControl(false),
-
-      // our custom validator
+      initialPasswordFormControl: new FormControl('', isNewUser ? [Validators.minLength(6)] : []),
     }, {});
     (window as any).myForm = this.myForm;
   }
@@ -77,6 +78,10 @@ export class UserFormComponent implements OnInit {
   }
 
   onSubmit() {
-    this.change.emit(this.user);
+    if (!this.myForm?.valid || this.loading) return;
+    const payload = this.initialPassword?.trim()
+      ? { user: this.user, initialPassword: this.initialPassword.trim() }
+      : { user: this.user };
+    this.change.emit(payload);
   }
 }

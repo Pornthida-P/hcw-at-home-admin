@@ -90,8 +90,7 @@ export class LoginComponent implements OnInit, OnDestroy {
               }, 1000);
             },
             (error) => {
-              console.log('err')
-              this.error = error;
+              this.error = error?.message === 'admin-only' ? 'admin.adminOnly' : (error?.error?.message || error?.message || error);
               this.loading = false;
             },
           ),
