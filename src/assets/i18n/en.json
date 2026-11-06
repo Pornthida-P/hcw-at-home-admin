@@ -138,12 +138,14 @@
     "edit": "Edit",
     "sendPasswordReset": "Send Password Reset Link",
     "sendPasswordResetConfirm": "Send a password reset link to {{name}}?",
-    "sendPasswordResetConfirmBody": "The user will receive an email with a secure link to set a new password. This link will expire in 5 minutes.",
-    "sendPasswordResetSuccess": "Password reset link sent successfully",
-    "sendPasswordResetError": "Failed to send password reset link",
-    "sendPasswordResetInProgress": "Sending...",
-    "activationLinkInfo": "When creating a user without a password, an activation email will be sent automatically. The link allows the user to set their own password and expires in 24 hours.",
-    "activationLinkNote": "Note: If account creation succeeds but the activation email fails to send, you can use the 'Send Password Reset Link' button on the user's detail page to send a new link."
+    "sendPasswordResetConfirmBody": "A password reset request will be sent. The user should check their email inbox for a secure link to set a new password. The link will have a time limit.",
+    "sendPasswordResetSuccess": "Password reset request accepted",
+    "sendPasswordResetError": "Failed to send password reset request",
+    "sendPasswordResetInProgress": "Sending request...",
+    "sendPasswordResetRateLimit": "Too many requests. Please try again later.",
+    "sendPasswordResetServerError": "Server error occurred. Please try again.",
+    "activationLinkInfo": "When creating a user without a password, an activation email will be sent automatically. The link allows the user to set their own password. Check with the user to confirm they received the email.",
+    "activationLinkNote": "Note: If account creation succeeds but the user does not receive the activation email, you can use the 'Send Password Reset Link' button on the user's detail page to send a new link."
   },
   "dashboard": {
     "from": "From",

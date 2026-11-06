@@ -218,14 +218,34 @@ export class UserDetailComponent implements OnInit {
   }
 
   private mapPasswordResetError(err: any): string {
-    const raw = typeof err === 'string' ? err : (err && (err.message || err.error || err)) || '';
-    const text = String(raw).toLowerCase();
+    // Backend returns error responses as { message: 'error-code' }
+    const errorMessage = err?.error?.message || err?.message || '';
+    const statusCode = err?.status || 0;
     
-    if (text.includes('forbidden') || text.includes('not authorized')) {
-      return this.translate.instant('admin.adminOnly');
+    // Map backend error codes from AuthController.sendPasswordReset
+    switch (errorMessage) {
+      case 'forbidden':
+        return this.translate.instant('admin.adminOnly');
+      case 'user-not-found':
+        return this.translate.instant('admin.sendPasswordResetError') + ': ' + this.translate.instant('admin.unknown');
+      case 'invalid-role':
+        return this.translate.instant('admin.sendPasswordResetError') + ': ' + this.translate.instant('admin.roleRequired');
+      case 'userId-required':
+        return this.translate.instant('admin.sendPasswordResetError');
+      case 'server-error':
+        return this.translate.instant('admin.sendPasswordResetServerError');
+      default:
+        break;
     }
-    if (text.includes('not found') || text.includes('user-not-found')) {
-      return this.translate.instant('admin.sendPasswordResetError') + ': ' + this.translate.instant('admin.unknown');
+    
+    // Handle rate limiting (429 status)
+    if (statusCode === 429) {
+      return this.translate.instant('admin.sendPasswordResetRateLimit');
+    }
+    
+    // Handle network errors
+    if (statusCode === 0 || statusCode >= 500) {
+      return this.translate.instant('admin.sendPasswordResetServerError');
     }
     
     return this.translate.instant('admin.sendPasswordResetError');

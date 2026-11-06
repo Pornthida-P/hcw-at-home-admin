@@ -68,7 +68,38 @@ describe('UserService', () => {
       );
 
       const req = httpMock.expectOne(`${environment.api}/admin/send-password-reset/${userId}`);
-      req.flush('User not found', mockError);
+      req.flush({ message: 'user-not-found' }, mockError);
+    });
+
+    it('should handle rate limit error (429)', () => {
+      const userId = 123;
+      const mockError = { status: 429, statusText: 'Too Many Requests' };
+
+      service.sendPasswordReset(userId).subscribe(
+        () => fail('should have failed with 429 error'),
+        (error) => {
+          expect(error.status).toBe(429);
+        }
+      );
+
+      const req = httpMock.expectOne(`${environment.api}/admin/send-password-reset/${userId}`);
+      req.flush({ message: 'rate-limit' }, mockError);
+    });
+
+    it('should handle server error (500)', () => {
+      const userId = 123;
+      const mockError = { status: 500, statusText: 'Internal Server Error' };
+
+      service.sendPasswordReset(userId).subscribe(
+        () => fail('should have failed with 500 error'),
+        (error) => {
+          expect(error.status).toBe(500);
+          expect(error.error.message).toBe('server-error');
+        }
+      );
+
+      const req = httpMock.expectOne(`${environment.api}/admin/send-password-reset/${userId}`);
+      req.flush({ message: 'server-error' }, mockError);
     });
   });
 });

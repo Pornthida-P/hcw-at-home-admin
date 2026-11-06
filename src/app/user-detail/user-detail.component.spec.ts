@@ -112,8 +112,62 @@ describe('UserDetailComponent', () => {
       }, 100);
     });
 
-    it('should handle error when sending password reset fails', (done) => {
-      const mockError = { error: 'Forbidden' };
+    it('should handle forbidden error (403)', (done) => {
+      const mockError = { status: 403, error: { message: 'forbidden' } };
+      const dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
+      
+      translate.instant = jasmine.createSpy().and.returnValue('Send Password Reset Link');
+      dialogRefSpy.afterClosed.and.returnValue(of({ event: 'Send Password Reset Link' }));
+      dialog.open.and.returnValue(dialogRefSpy);
+      userService.sendPasswordReset.and.returnValue(throwError(mockError));
+
+      component.sendPasswordReset();
+
+      setTimeout(() => {
+        expect(snackBar.open).toHaveBeenCalled();
+        expect(component.isSendingPasswordReset).toBe(false);
+        done();
+      }, 100);
+    });
+
+    it('should handle user not found error (404)', (done) => {
+      const mockError = { status: 404, error: { message: 'user-not-found' } };
+      const dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
+      
+      translate.instant = jasmine.createSpy().and.returnValue('Send Password Reset Link');
+      dialogRefSpy.afterClosed.and.returnValue(of({ event: 'Send Password Reset Link' }));
+      dialog.open.and.returnValue(dialogRefSpy);
+      userService.sendPasswordReset.and.returnValue(throwError(mockError));
+
+      component.sendPasswordReset();
+
+      setTimeout(() => {
+        expect(snackBar.open).toHaveBeenCalled();
+        expect(component.isSendingPasswordReset).toBe(false);
+        done();
+      }, 100);
+    });
+
+    it('should handle rate limit error (429)', (done) => {
+      const mockError = { status: 429, error: { message: 'rate-limit' } };
+      const dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
+      
+      translate.instant = jasmine.createSpy().and.returnValue('Send Password Reset Link');
+      dialogRefSpy.afterClosed.and.returnValue(of({ event: 'Send Password Reset Link' }));
+      dialog.open.and.returnValue(dialogRefSpy);
+      userService.sendPasswordReset.and.returnValue(throwError(mockError));
+
+      component.sendPasswordReset();
+
+      setTimeout(() => {
+        expect(snackBar.open).toHaveBeenCalled();
+        expect(component.isSendingPasswordReset).toBe(false);
+        done();
+      }, 100);
+    });
+
+    it('should handle server error (500)', (done) => {
+      const mockError = { status: 500, error: { message: 'server-error' } };
       const dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
       
       translate.instant = jasmine.createSpy().and.returnValue('Send Password Reset Link');
