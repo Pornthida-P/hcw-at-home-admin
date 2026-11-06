@@ -1,10 +1,18 @@
 <!-- dialog-box.component.html -->
 <div mat-dialog-content>
-    <mat-form-field *ngIf="action != 'Delete'; else elseTemplate">
+    <mat-form-field *ngIf="action != 'Delete' && !local_data.message; else elseTemplate">
         <input [placeholder]="'admin.actionNamePlaceholder' | translate: { action: action }" matInput [(ngModel)]="local_data.name">
     </mat-form-field>
     <ng-template #elseTemplate>
-        {{ 'admin.sureToDelete' | translate: { name: local_data.name } }}
+        <div *ngIf="action == 'Delete'; else customMessageTemplate">
+            {{ 'admin.sureToDelete' | translate: { name: local_data.name } }}
+        </div>
+        <ng-template #customMessageTemplate>
+            <div *ngIf="local_data.message">
+                <p style="margin-bottom: 10px; font-weight: 500;">{{ local_data.name }}</p>
+                <p style="margin: 0; color: #616161;">{{ local_data.message }}</p>
+            </div>
+        </ng-template>
     </ng-template>
 </div>
 <div mat-dialog-actions>
