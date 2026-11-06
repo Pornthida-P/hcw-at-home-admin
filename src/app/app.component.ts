@@ -2,27 +2,31 @@ import { AuthService } from './auth/auth.service';
 import { Component, OnInit } from '@angular/core';
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
-import { TranslateService } from '@ngx-translate/core';
 import { User } from './types/user';
+import { TranslateService } from '@ngx-translate/core';
+import { ADMIN_LANG_STORAGE_KEY } from './i18n/i18n.module';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit {
   navigated = true;
 
   currentUser: User;
+  languages = [
+    { code: 'en', label: 'English' },
+    { code: 'th', label: 'ไทย' },
+  ];
+  currentLang: string;
 
   constructor(
     iconRegistry: MatIconRegistry,
     sanitizer: DomSanitizer,
     private authService: AuthService,
-    private translate: TranslateService,
+    private translate: TranslateService
   ) {
-    translate.setDefaultLang('en');
-    translate.use('en');
     iconRegistry.addSvgIcon('dashboard', sanitizer.bypassSecurityTrustResourceUrl('assets/svg/icon-dashboard.svg'));
     iconRegistry.addSvgIcon('queue', sanitizer.bypassSecurityTrustResourceUrl('assets/svg/icon-queue.svg'));
     iconRegistry.addSvgIcon('server', sanitizer.bypassSecurityTrustResourceUrl('assets/svg/server.svg'));
@@ -38,17 +42,28 @@ export class AppComponent implements OnInit {
     iconRegistry.addSvgIcon('hangup', sanitizer.bypassSecurityTrustResourceUrl('assets/svg/icon-hangup.svg'));
     iconRegistry.addSvgIcon('incoming', sanitizer.bypassSecurityTrustResourceUrl('assets/svg/icon-audio.svg'));
     iconRegistry.addSvgIcon('cameraOff', sanitizer.bypassSecurityTrustResourceUrl('assets/svg/icon-cameraOff.svg'));
-    iconRegistry.addSvgIcon('logout', sanitizer.bypassSecurityTrustResourceUrl('../assets/svg/icon-logout.svg'));
-    iconRegistry.addSvgIcon('attach', sanitizer.bypassSecurityTrustResourceUrl('../assets/svg/icon-attachment.svg'));
-    iconRegistry.addSvgIcon('pdf', sanitizer.bypassSecurityTrustResourceUrl('../assets/svg/file-pdf-solid.svg'));
-    iconRegistry.addSvgIcon('send', sanitizer.bypassSecurityTrustResourceUrl('../assets/svg/paper-plane-solid.svg'));
-    iconRegistry.addSvgIcon('question', sanitizer.bypassSecurityTrustResourceUrl('../assets/svg/question-circle-solid.svg'));
-    iconRegistry.addSvgIcon('invite', sanitizer.bypassSecurityTrustResourceUrl('../assets/svg/icon-invite.svg'));
+    iconRegistry.addSvgIcon('logout', sanitizer.bypassSecurityTrustResourceUrl('assets/svg/icon-logout.svg'));
+    iconRegistry.addSvgIcon('attach', sanitizer.bypassSecurityTrustResourceUrl('assets/svg/icon-attachment.svg'));
+    iconRegistry.addSvgIcon('pdf', sanitizer.bypassSecurityTrustResourceUrl('assets/svg/file-pdf-solid.svg'));
+    iconRegistry.addSvgIcon('send', sanitizer.bypassSecurityTrustResourceUrl('assets/svg/paper-plane-solid.svg'));
+    iconRegistry.addSvgIcon(
+      'question',
+      sanitizer.bypassSecurityTrustResourceUrl('assets/svg/question-circle-solid.svg')
+    );
+    iconRegistry.addSvgIcon('invite', sanitizer.bypassSecurityTrustResourceUrl('assets/svg/icon-invite.svg'));
+  }
 
+  changeLanguage(lang: string) {
+    this.currentLang = lang;
+    this.translate.use(lang);
+    try {
+      window.localStorage.setItem(ADMIN_LANG_STORAGE_KEY, lang);
+    } catch (e) {}
   }
 
   ngOnInit() {
-    this.authService.currentUser.subscribe(user => {
+    this.currentLang = this.translate.currentLang || 'en';
+    this.authService.currentUser.subscribe((user) => {
       this.currentUser = user;
     });
   }

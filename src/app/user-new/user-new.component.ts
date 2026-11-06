@@ -1,3 +1,4 @@
+import { TranslateService } from '@ngx-translate/core';
 import { Component, OnInit } from '@angular/core';
 import { UserService } from '../user.service';
 import { Location } from '@angular/common';
@@ -12,49 +13,39 @@ export class UserNewComponent implements OnInit {
   error = '';
 
   constructor(private userService: UserService,
-    private location: Location
+    private location: Location,
+    private translate: TranslateService
   ) { }
 
   ngOnInit(): void {
     console.log("init new user")
   }
 
-  createUser(payload: { user: any; initialPassword?: string }) {
-    if (this.loading) return;
-    this.error = '';
-    const user = payload?.user;
-    const email = (user?.email || '').trim().toLowerCase();
-    if (!email) return;
-
+  createUser(user) {
+    console.log("userDetail", user);
     this.loading = true;
-    this.userService.find({ email }).subscribe(
-      (existing) => {
-        if (existing && existing.length > 0) {
-          this.loading = false;
-          this.error = 'admin.emailAlreadyUsed';
-          return;
-        }
-        this.doCreate(user, payload.initialPassword);
-      },
-      () => {
-        this.loading = false;
-        this.doCreate(user, payload.initialPassword);
-      }
-    );
-  }
-
-  private doCreate(user: any, initialPassword?: string) {
-    const body = initialPassword ? { ...user, password: initialPassword } : user;
-    this.userService.create(body).subscribe(
-      () => {
+    this.error = '';
+    this.userService.create(user).subscribe(
+      (res) => {
+        console.log(res);
         this.loading = false;
         this.location.back();
       },
       (err) => {
+        console.log(err);
         this.loading = false;
-        const msg = err?.error?.message || err?.error?.error || err?.message || 'admin.createUserError';
-        this.error = typeof msg === 'string' && msg.includes('already') ? 'admin.emailAlreadyUsed' : (typeof msg === 'string' ? msg : 'admin.createUserError');
-      }
-    );
+        this.error = this.mapUserError(err);
+      });
+  }
+
+
+
+  private mapUserError(err: any): string {
+    const raw = typeof err === 'string' ? err : (err && (err.message || err.error || err)) || '';
+    const text = String(raw);
+    if (/email already/i.test(text) || /already in use/i.test(text) || /already used/i.test(text)) {
+      return this.translate.instant('admin.emailAlreadyUsed');
+    }
+    return text;
   }
 }

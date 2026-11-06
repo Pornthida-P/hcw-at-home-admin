@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, NgZone, EventEmitter, Output } from '@angular/core';
 import { AuthService } from '../auth/auth.service';
 import { Location } from '@angular/common';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-top-nav',
@@ -20,7 +21,12 @@ export class TopNavComponent implements OnInit {
     private authService: AuthService,
     private location: Location,
     private zone: NgZone,
+    private translate: TranslateService,
     ) { }
+
+  get dateLocale(): string {
+    return this.translate.currentLang === 'th' ? 'th' : 'en';
+  }
 
   ngOnInit() {
 

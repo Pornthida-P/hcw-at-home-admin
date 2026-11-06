@@ -15,7 +15,7 @@
           width: 28px;"
         svgIcon="stat"
       ></mat-icon>
-      {{ 'admin.label' | translate }} {{ currentUser.firstName + " " + currentUser.lastName }}
+      {{ 'admin.label' | translate }} {{ ((currentUser.firstName || "") + " " + (currentUser.lastName || "")).trim() || currentUser.email }}
       <div
         (click)="logout()"
         style="position: absolute;    bottom: -100%;         left: 0;     height: 70px; width: 100%; background: #E3393A; color: white;"
@@ -80,8 +80,8 @@
     >
       {{
         consultation.consultation.birthDate
-          ? (consultation.consultation.birthDate | date: "d MMM yyyy")
-          : ('admin.none' | translate)
+          ? (consultation.consultation.birthDate | date: "d MMM yyyy" : undefined : dateLocale)
+          : ("admin.none" | translate)
       }}
     </div>
   </div>
@@ -93,7 +93,7 @@
       style="height: 62%; font-size: 1em;    padding-top: 5px;
 "
     >
-      {{ consultation.nurse ? consultation.nurse.firstName + " " : ('admin.none' | translate)
+      {{ consultation.nurse ? consultation.nurse.firstName + " " : ("admin.none" | translate)
       }}{{
         consultation.nurse ? (consultation.nurse.lastName | uppercase) : ""
       }}

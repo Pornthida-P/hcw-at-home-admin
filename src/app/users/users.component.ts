@@ -5,6 +5,9 @@ import { User } from '../types/user';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
+import { MatDialog } from '@angular/material/dialog';
+import { DialogBoxComponent } from '../dialog-box/dialog-box.component';
 @Component({
   selector: 'app-users',
   templateUrl: './users.component.html',
@@ -25,7 +28,12 @@ export class UsersComponent implements OnInit, OnDestroy {
   pageSizeOptions = ['10', '50', '100'];
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
 
-  constructor(private userService: UserService, private router: Router) {}
+  constructor(
+    private userService: UserService,
+    private router: Router,
+    private translate: TranslateService,
+    public dialog: MatDialog
+  ) {}
 
   ngOnInit(): void {
     this.getDoctors();
@@ -36,8 +44,9 @@ export class UsersComponent implements OnInit, OnDestroy {
 
   getDoctors() {
     this.loading = true;
+      const roles = { role: { in: ['doctor', 'scheduler', 'admin'] }}
     this.subscriptions.push(
-      this.userService.find().subscribe(
+      this.userService.find(roles).subscribe(
         (res) => {
           this.users = res;
           // this.count = res.totalCount;
@@ -103,16 +112,23 @@ export class UsersComponent implements OnInit, OnDestroy {
      this.getUsersByPage(this.pageSize, this.pageIndex);*/
   }
   deleteUser(user) {
-    if (confirm('Etes-vous sûr de vouloir supprimer cet utilisateur?')) {
-      this.userService.delete(user).subscribe(
-        (res) => {
-          this.getDoctors();
-        },
-        (err) => {
-          this.error = err;
-        }
-      );
-    }
+    const name = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email;
+    const dialogRef = this.dialog.open(DialogBoxComponent, {
+      width: '250px',
+      data: { action: 'Delete', name },
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result && result.event === 'Delete') {
+        this.userService.delete(user).subscribe(
+          (res) => {
+            this.getDoctors();
+          },
+          (err) => {
+            this.error = err;
+          }
+        );
+      }
+    });
   }
   /* useful for dynamic pagination getUsersByPage(limit, skip) {
 // this.loading = true;

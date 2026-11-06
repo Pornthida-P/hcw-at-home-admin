@@ -13,3 +13,33 @@ button {
 .url-wrapper {
   min-width: 320px;
 }
+
+.sessions-wrapper {
+  min-width: 240px;
+}
+
+// The global style shifts every form field label 41% to the right, which
+// clips the labels (and the required '*') of the fields of this page.
+:host ::ng-deep .mat-form-field-label {
+  left: 0 !important;
+}
+
+.active-toggle {
+  margin-right: 20px;
+}
+
+.no-config-info {
+  color: rgba(0, 0, 0, 0.6);
+  margin: 0 0 16px;
+}
+
+.save-error {
+  color: #f44336;
+  font-size: 13px;
+  margin: 4px 0 12px;
+}
+
+// Make the required '*' of the mandatory fields clearly visible
+:host ::ng-deep .mat-form-field-required-marker {
+  color: #f44336;
+}

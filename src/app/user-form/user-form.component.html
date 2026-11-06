@@ -1,20 +1,15 @@
 <form *ngIf="myForm" class="invite-form" [formGroup]="myForm" (submit)="onSubmit()">
 
     <div class="field-container">
-        <!-- useful if manage multiple role mat-form-field>
-            <mat-label class="label">Role</mat-label>
+        <mat-form-field>
+            <mat-label class="label">{{ 'admin.role' | translate }}</mat-label>
             <mat-select formControlName="roleFormControl" required [(ngModel)]="user.role"
-                [errorStateMatcher]="matcher">
-                <mat-option>--</mat-option>
-                <mat-option value="doctor">Docteur</mat-option>
-                <mat-option value="nurse">Infirmière</mat-option>
-                <mat-option value="admin">Admin</mat-option>
-                <mat-option value="patient">Patient</mat-option>
-
+                (selectionChange)="onRoleChange()" [errorStateMatcher]="matcher">
+                <mat-option *ngFor="let role of roleOptions" [value]="role">{{ 'admin.role_' + role | translate }}</mat-option>
             </mat-select>
-            <mat-error *ngIf="myForm.controls.roleFormControl.hasError('required')">Veuillez choisir un role
+            <mat-error *ngIf="myForm.controls.roleFormControl.hasError('required')">{{ 'admin.roleRequired' | translate }}
             </mat-error>
-        </mat-form-field-->
+        </mat-form-field>
         <mat-form-field *ngIf="user.role == 'patient'">
             <mat-label class="label">{{ 'admin.gender' | translate }}</mat-label>
             <mat-select formControlName="genderFormControl" required [(ngModel)]="user.gender"
@@ -53,12 +48,12 @@
         <mat-form-field>
             <mat-label class="label">{{ 'admin.email' | translate }}</mat-label>
             <input [(ngModel)]="user.email" matInput [placeholder]="'admin.email' | translate" formControlName="emailFormControl"
-                [errorStateMatcher]="matcher" />
+                [errorStateMatcher]="matcher" [required]="emailRequired" />
 
             <mat-error *ngIf="myForm.controls.emailFormControl.hasError('required')">
                 {{ 'admin.emailRequired' | translate }}
             </mat-error>
-            <mat-error *ngIf="myForm.controls.emailFormControl.hasError('email') && !myForm.controls.emailFormControl.hasError('required')">
+            <mat-error *ngIf="myForm.controls.emailFormControl.hasError('email')">
                 {{ 'login.pleaseProvideAValidEmail' | translate }}
             </mat-error>
         </mat-form-field>
@@ -69,18 +64,6 @@
 
             <mat-error *ngIf="myForm.controls.phoneNumberFormControl.hasError('pattern')">
                 {{ 'admin.phoneFormatError' | translate }}
-            </mat-error>
-        </mat-form-field>
-    </div>
-    <div *ngIf="!user?.id" class="field-container">
-        <mat-form-field>
-            <mat-label class="label">{{ 'admin.initialPassword' | translate }}</mat-label>
-            <input [(ngModel)]="initialPassword" type="password" matInput
-                [placeholder]="'admin.initialPasswordPlaceholder' | translate"
-                formControlName="initialPasswordFormControl" [errorStateMatcher]="matcher" />
-            <mat-hint>{{ 'admin.initialPasswordHint' | translate }}</mat-hint>
-            <mat-error *ngIf="myForm.controls.initialPasswordFormControl.hasError('minlength')">
-                {{ 'admin.initialPasswordMinLength' | translate }}
             </mat-error>
         </mat-form-field>
     </div>
@@ -113,11 +96,14 @@
             </mat-form-field>
         </div>
     </div>
+    <div *ngIf="error" class="form-error">
+        {{ error }}
+    </div>
     <div mat-dialog-actions>
         <button mat-button (click)="cancel()" type="button">
             {{ 'admin.cancel' | translate }}
         </button>
-        <button class="btn__send" [disabled]="loading || !myForm?.valid" type="submit" mat-button>
+        <button class="btn__send" [disabled]="loading" type="submit" mat-button>
             {{ 'admin.send' | translate }}
         </button>
     </div>

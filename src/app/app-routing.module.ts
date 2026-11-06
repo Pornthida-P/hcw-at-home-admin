@@ -10,9 +10,14 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { LoginComponent } from './login/login.component';
 import { MediasoupComponent } from "./mediasoup/mediasoup.component";
 import {CliniciansComponent} from "./clinicians/clinicians.component";
+import { NotFoundComponent } from './not-found/not-found.component';
 
 
 const routes: Routes = [
+  {
+    path: 'login',
+    component: LoginComponent
+  },
   {
     path: '',
     canActivate: [AuthGuard, RouterGuard],
@@ -78,12 +83,16 @@ const routes: Routes = [
         },
         canActivate: [RouterGuard]
       },
+      {
+        path: '**',
+        component: NotFoundComponent,
+        data: {
+          title: 'Not found'
+        }
+      },
     ]
   },
-  {
-  path: 'login',
-  component: LoginComponent
-}, ];
+];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],

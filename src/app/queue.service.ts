@@ -15,7 +15,8 @@ export class QueueService {
   }
 
   find(): Observable<Queue[]> {
-    return this.http.get<Queue[]>(environment.api + `/queue`);
+    // admins must see every queue, not only the queues allowed to their own account
+    return this.http.get<Queue[]>(environment.api + `/queue?viewAllQueues=true`);
   }
 
   create(queue: Queue): Observable<Queue> {

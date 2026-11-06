@@ -29,6 +29,7 @@
           },
           "configurations": {
             "production": {
+              "baseHref": "/hcw-at-home-admin/",
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",

@@ -1,7 +1,8 @@
 <ng-container>
   <div class="wrap">
     <div class="container">
-      <div class="at">@ <span>{{ 'login.home' | translate }}</span></div>
+      <div class="at">@ <span>{{ 'login.home' | translate }}</span>
+      </div>
 
       <p id="saml-login" *ngIf="showSamlLogin">
         <a [href]="samlLoginUrl" class="redirect-btn" mat-button
@@ -100,7 +101,7 @@
         </div>
 
         <div *ngIf="error" class="error">
-          {{ error | translate }}
+          {{ error }}
         </div>
       </div>
     </div>

@@ -1,0 +1,136 @@
+//  admin dashboard (stats + date range)
+.dashboard {
+  padding: 8px 4px 24px;
+}
+
+.filters {
+  margin-bottom: 16px;
+
+  .quick-ranges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+
+    button.selected {
+      background: #e5eef7;
+      border-color: #2871bd;
+      color: #1e5eae;
+    }
+  }
+
+  .date-range {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+
+    .date-field {
+      width: 170px;
+    }
+
+    mat-icon {
+      margin-right: 4px;
+      vertical-align: middle;
+    }
+  }
+
+  .range-hint {
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  .range-error {
+    font-size: 12px;
+    color: #f44336;
+  }
+
+  .error {
+    margin-top: 8px;
+    color: #f44336;
+  }
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  padding: 24px;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+
+  .card {
+    background: #fff;
+    border-radius: 8px;
+    border-left: 4px solid #2871bd;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+    padding: 14px 16px;
+
+    .card-label {
+      font-size: 13px;
+      color: #464f60;
+      margin-bottom: 6px;
+    }
+
+    .card-value {
+      font-size: 30px;
+      font-weight: 500;
+      color: #0f4298;
+
+      &.small {
+        font-size: 20px;
+        line-height: 36px;
+      }
+    }
+
+    .card-sub {
+      font-size: 12px;
+      color: rgba(0, 0, 0, 0.6);
+      margin-top: 4px;
+    }
+
+    .muted {
+      font-size: 14px;
+      color: rgba(0, 0, 0, 0.6);
+    }
+
+    .good {
+      color: #2e7d32;
+    }
+    .ok {
+      color: #f9a825;
+    }
+    .bad {
+      color: #c62828;
+    }
+  }
+}
+
+.tables {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+
+  .table-block {
+    flex: 1 1 420px;
+    min-width: 320px;
+
+    h3 {
+      margin: 0 0 8px;
+      font-weight: 500;
+    }
+
+    table {
+      width: 100%;
+    }
+  }
+}
+
+.no-data {
+  color: rgba(0, 0, 0, 0.6);
+  padding: 8px 0;
+}

@@ -6,6 +6,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { DialogBoxComponent } from '../dialog-box/dialog-box.component';
 import { MatDialog } from '@angular/material/dialog';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-queues',
@@ -24,7 +25,11 @@ export class QueuesComponent implements OnInit {
   @ViewChild('scheduledOrdersPaginator') paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
-  constructor(private queueService: QueueService, public dialog: MatDialog) {}
+  constructor(
+    private queueService: QueueService,
+    public dialog: MatDialog,
+    private translate: TranslateService
+  ) {}
 
   ngOnInit(): void {
     this.getQueues();
@@ -61,16 +66,24 @@ export class QueuesComponent implements OnInit {
   }
 
   deleteQueue(queue) {
-    if (confirm('Etes-vous sûr de vouloir la supprimer ?')) {
-      this.queueService.delete(queue).subscribe(
-        (res) => {
-          this.getQueues();
-        },
-        (err) => {
-          this.error = err;
-        }
-      );
-    }
+    const dialogRef = this.dialog.open(DialogBoxComponent, {
+      width: '250px',
+      data: { action: 'Delete', name: queue.name },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result && result.event === 'Delete') {
+        this.error = '';
+        this.queueService.delete(queue).subscribe(
+          (res) => {
+            this.getQueues();
+          },
+          (err) => {
+            this.error = err;
+          }
+        );
+      }
+    });
   }
 
   deleteRowData(row_obj) {
@@ -81,17 +94,24 @@ export class QueuesComponent implements OnInit {
 
   createQueue() {
     console.log(this.newQueueName);
-    if (this.newQueueName.trim()) {
-      this.queueService.create({ name: this.newQueueName }).subscribe(
-        (res) => {
-          this.newQueueName = '';
-          this.getQueues();
-        },
-        (err) => {
-          this.error = err;
-        }
-      );
+    this.error = '';
+    if (!this.newQueueName || !this.newQueueName.trim()) {
+      this.error = this.translate.instant('admin.queueNameRequired');
+      return;
     }
+    if (this.isDuplicateName(this.newQueueName)) {
+      this.error = this.translate.instant('admin.queueNameExists');
+      return;
+    }
+    this.queueService.create({ name: this.newQueueName.replace(/\s+/g, ' ').trim() }).subscribe(
+      (res) => {
+        this.newQueueName = '';
+        this.getQueues();
+      },
+      (err) => {
+        this.error = this.queueErrorMessage(err);
+      }
+    );
   }
   openDialog(action, obj) {
     obj.action = action;
@@ -101,14 +121,47 @@ export class QueuesComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((result) => {
-      if (result.event == 'Update') {
-        this.queueService.updateQueue(result.data.id, result.data.name).subscribe(
+      if (result && result.event == 'Update') {
+        this.error = '';
+        if (!result.data.name || !result.data.name.trim()) {
+          this.error = this.translate.instant('admin.queueNameRequired');
+          return;
+        }
+        if (this.isDuplicateName(result.data.name, result.data.id)) {
+          this.error = this.translate.instant('admin.queueNameExists');
+          return;
+        }
+        this.queueService.updateQueue(result.data.id, result.data.name.replace(/\s+/g, ' ').trim()).subscribe(
           (res) => {
             this.getQueues();
           },
-          (err) => {}
+          (err) => {
+            this.error = this.queueErrorMessage(err);
+          }
         );
       }
     });
+  }
+
+  private normalizeQueueName(name: string): string {
+    return (name || '').replace(/\s+/g, ' ').trim().toLowerCase();
+  }
+
+  isDuplicateName(name: string, ignoreId?: string): boolean {
+    const normalized = this.normalizeQueueName(name);
+    return this.queues.some(
+      (queue) => queue.id !== ignoreId && this.normalizeQueueName(queue.name) === normalized
+    );
+  }
+
+  queueErrorMessage(err) {
+    const raw = typeof err === 'string'
+      ? err
+      : (err && (err.message || err.error || err.details)) || '';
+    const text = String(raw);
+    if (text.indexOf('QUEUE_NAME_EXISTS') > -1 || text.toLowerCase().indexOf('already exists') > -1) {
+      return this.translate.instant('admin.queueNameExists');
+    }
+    return typeof err === 'string' ? err : text || err;
   }
 }

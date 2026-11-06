@@ -1,3 +1,185 @@
-<ng-container >
-  <a mat-raised-button (click)="downloadCSV()">{{ 'admin.downloadCsv' | translate }}</a>
-</ng-container>
+<div class="dashboard">
+  <h2>{{ 'admin.dashboard' | translate }}</h2>
+
+  <!--  date range filter (applies to the stats AND the CSV export) -->
+  <div class="filters">
+    <div class="quick-ranges">
+      <button mat-stroked-button type="button" [class.selected]="quickRange === '7d'" (click)="setQuickRange('7d')">
+        {{ 'dashboard.last7Days' | translate }}
+      </button>
+      <button mat-stroked-button type="button" [class.selected]="quickRange === '30d'" (click)="setQuickRange('30d')">
+        {{ 'dashboard.last30Days' | translate }}
+      </button>
+      <button
+        mat-stroked-button
+        type="button"
+        [class.selected]="quickRange === 'month'"
+        (click)="setQuickRange('month')"
+      >
+        {{ 'dashboard.thisMonth' | translate }}
+      </button>
+      <button mat-stroked-button type="button" [class.selected]="quickRange === 'all'" (click)="setQuickRange('all')">
+        {{ 'dashboard.allTime' | translate }}
+      </button>
+    </div>
+
+    <div class="date-range">
+      <mat-form-field class="date-field">
+        <mat-label>{{ 'dashboard.from' | translate }}</mat-label>
+        <input
+          matInput
+          type="date"
+          [(ngModel)]="fromDate"
+          [max]="toDate || null"
+          [errorStateMatcher]="rangeErrorMatcher"
+          (ngModelChange)="onDateChange()"
+        />
+      </mat-form-field>
+      <mat-form-field class="date-field">
+        <mat-label>{{ 'dashboard.to' | translate }}</mat-label>
+        <input
+          matInput
+          type="date"
+          [(ngModel)]="toDate"
+          [min]="fromDate || null"
+          [errorStateMatcher]="rangeErrorMatcher"
+          (ngModelChange)="onDateChange()"
+        />
+      </mat-form-field>
+      <button mat-flat-button color="primary" type="button" (click)="apply()" [disabled]="loading || rangeInvalid">
+        {{ 'dashboard.apply' | translate }}
+      </button>
+      <button mat-raised-button type="button" (click)="downloadCSV()" [disabled]="downloading || rangeInvalid">
+        <mat-icon>file_download</mat-icon>
+        {{ 'admin.downloadCsv' | translate }}
+      </button>
+    </div>
+    <div class="range-error" role="alert" *ngIf="rangeInvalid">{{ 'dashboard.invalidRange' | translate }}</div>
+    <div class="range-hint" *ngIf="!rangeInvalid">
+      <ng-container *ngIf="fromDate || toDate; else allTimeHint">
+        {{ 'dashboard.period' | translate }}: {{ fromDate || '…' }} → {{ toDate || '…' }}
+      </ng-container>
+      <ng-template #allTimeHint
+        >{{ 'dashboard.period' | translate }}: {{ 'dashboard.allTime' | translate }}</ng-template
+      >
+      · {{ 'dashboard.rangeHint' | translate }}
+    </div>
+    <div class="error" *ngIf="error">{{ error }}</div>
+  </div>
+
+  <div class="loading" *ngIf="loading">
+    <mat-spinner [diameter]="36"></mat-spinner>
+  </div>
+
+  <ng-container *ngIf="stats && !loading && !rangeInvalid">
+    <div class="cards">
+      <div class="card">
+        <div class="card-label">{{ 'dashboard.total' | translate }}</div>
+        <div class="card-value">{{ stats.total }}</div>
+      </div>
+      <div class="card">
+        <div class="card-label">{{ 'dashboard.closed' | translate }}</div>
+        <div class="card-value">{{ stats.closed }}</div>
+      </div>
+      <div class="card">
+        <div class="card-label">{{ 'dashboard.active' | translate }}</div>
+        <div class="card-value">{{ stats.active }}</div>
+      </div>
+      <div class="card">
+        <div class="card-label">{{ 'dashboard.pending' | translate }}</div>
+        <div class="card-value">{{ stats.pending }}</div>
+      </div>
+      <div class="card">
+        <div class="card-label">{{ 'dashboard.averageDuration' | translate }}</div>
+        <div class="card-value small">{{ formatDuration(stats.averageDuration) }}</div>
+      </div>
+      <div class="card">
+        <div class="card-label">{{ 'dashboard.averageWaitingTime' | translate }}</div>
+        <div class="card-value small">{{ formatDuration(stats.averageWaitingTime) }}</div>
+      </div>
+      <div class="card">
+        <div class="card-label">{{ 'dashboard.calls' | translate }}</div>
+        <div class="card-value small">
+          {{ stats.successfulCalls }}
+          <span class="muted">/ {{ stats.missedCalls }} {{ 'dashboard.missed' | translate }}</span>
+        </div>
+        <div class="card-sub">
+          {{ 'dashboard.averageCallDuration' | translate }}: {{ formatDuration(stats.averageCallDuration) }}
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-label">{{ 'dashboard.patientSatisfaction' | translate }}</div>
+        <div class="card-value small">
+          <span class="good">{{ stats.patientRatings?.good || 0 }}</span> /
+          <span class="ok">{{ stats.patientRatings?.ok || 0 }}</span> /
+          <span class="bad">{{ stats.patientRatings?.bad || 0 }}</span>
+        </div>
+        <div class="card-sub">{{ 'dashboard.ratingLegend' | translate }}</div>
+      </div>
+    </div>
+
+    <div class="tables">
+      <div class="table-block">
+        <h3>{{ 'dashboard.byDoctor' | translate }}</h3>
+        <table
+          mat-table
+          [dataSource]="stats.byDoctor"
+          class="mat-elevation-z1"
+          *ngIf="stats.byDoctor?.length; else noData"
+        >
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>{{ 'dashboard.doctor' | translate }}</th>
+            <td mat-cell *matCellDef="let row">{{ row.name || ('admin.unknown' | translate) }}</td>
+          </ng-container>
+          <ng-container matColumnDef="count">
+            <th mat-header-cell *matHeaderCellDef>{{ 'dashboard.closed' | translate }}</th>
+            <td mat-cell *matCellDef="let row">{{ row.count }}</td>
+          </ng-container>
+          <ng-container matColumnDef="averageDuration">
+            <th mat-header-cell *matHeaderCellDef>{{ 'dashboard.averageDuration' | translate }}</th>
+            <td mat-cell *matCellDef="let row">{{ formatDuration(row.averageDuration) }}</td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="doctorColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: doctorColumns"></tr>
+        </table>
+      </div>
+
+      <div class="table-block">
+        <h3>{{ 'dashboard.byQueue' | translate }}</h3>
+        <table
+          mat-table
+          [dataSource]="stats.byQueue"
+          class="mat-elevation-z1"
+          *ngIf="stats.byQueue?.length; else noData"
+        >
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>{{ 'dashboard.queue' | translate }}</th>
+            <td mat-cell *matCellDef="let row">{{ row.name || ('dashboard.noQueue' | translate) }}</td>
+          </ng-container>
+          <ng-container matColumnDef="total">
+            <th mat-header-cell *matHeaderCellDef>{{ 'dashboard.total' | translate }}</th>
+            <td mat-cell *matCellDef="let row">{{ row.total }}</td>
+          </ng-container>
+          <ng-container matColumnDef="pending">
+            <th mat-header-cell *matHeaderCellDef>{{ 'dashboard.pending' | translate }}</th>
+            <td mat-cell *matCellDef="let row">{{ row.pending }}</td>
+          </ng-container>
+          <ng-container matColumnDef="active">
+            <th mat-header-cell *matHeaderCellDef>{{ 'dashboard.active' | translate }}</th>
+            <td mat-cell *matCellDef="let row">{{ row.active }}</td>
+          </ng-container>
+          <ng-container matColumnDef="closed">
+            <th mat-header-cell *matHeaderCellDef>{{ 'dashboard.closed' | translate }}</th>
+            <td mat-cell *matCellDef="let row">{{ row.closed }}</td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="queueColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: queueColumns"></tr>
+        </table>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-template #noData>
+    <div class="no-data">{{ 'dashboard.noData' | translate }}</div>
+  </ng-template>
+</div>
