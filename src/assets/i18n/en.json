@@ -135,7 +135,15 @@
     "durationHour": "h",
     "durationMinute": "min",
     "durationSecond": "s",
-    "edit": "Edit"
+    "edit": "Edit",
+    "sendPasswordReset": "Send Password Reset Link",
+    "sendPasswordResetConfirm": "Send a password reset link to {{name}}?",
+    "sendPasswordResetConfirmBody": "The user will receive an email with a secure link to set a new password. This link will expire in 5 minutes.",
+    "sendPasswordResetSuccess": "Password reset link sent successfully",
+    "sendPasswordResetError": "Failed to send password reset link",
+    "sendPasswordResetInProgress": "Sending...",
+    "activationLinkInfo": "When creating a user without a password, an activation email will be sent automatically. The link allows the user to set their own password and expires in 24 hours.",
+    "activationLinkNote": "Note: If account creation succeeds but the activation email fails to send, you can use the 'Send Password Reset Link' button on the user's detail page to send a new link."
   },
   "dashboard": {
     "from": "From",

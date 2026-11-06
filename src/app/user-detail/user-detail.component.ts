@@ -5,6 +5,9 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { UserService } from '../user.service';
 import { User } from '../types/user';
 import { Location } from '@angular/common';
+import { MatDialog } from '@angular/material/dialog';
+import { DialogBoxComponent } from '../dialog-box/dialog-box.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-user-detail',
@@ -18,6 +21,7 @@ export class UserDetailComponent implements OnInit {
   loadingAllQueues: boolean;
   isAddingQueues = false;
   isRemovingQueues = false;
+  isSendingPasswordReset = false;
   error;
   updateError = '';
   userId;
@@ -30,7 +34,9 @@ export class UserDetailComponent implements OnInit {
     private userService: UserService,
     private queueService: QueueService,
     private location: Location,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -161,5 +167,67 @@ export class UserDetailComponent implements OnInit {
       return this.translate.instant('admin.emailAlreadyUsed');
     }
     return text;
+  }
+
+  sendPasswordReset() {
+    if (this.isSendingPasswordReset || !this.user) {
+      return;
+    }
+
+    const name = `${this.user.firstName || ''} ${this.user.lastName || ''}`.trim() || this.user.email || this.translate.instant('admin.unknown');
+    
+    const confirmMessage = this.translate.instant('admin.sendPasswordResetConfirm', { name });
+    const confirmBody = this.translate.instant('admin.sendPasswordResetConfirmBody');
+    
+    const dialogRef = this.dialog.open(DialogBoxComponent, {
+      width: '400px',
+      data: { 
+        action: this.translate.instant('admin.sendPasswordReset'), 
+        name: confirmMessage,
+        message: confirmBody
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result && result.event === this.translate.instant('admin.sendPasswordReset')) {
+        this.isSendingPasswordReset = true;
+        
+        this.userService.sendPasswordReset(this.userId).subscribe(
+          (res) => {
+            this.isSendingPasswordReset = false;
+            if (res && res.success) {
+              this.snackBar.open(
+                this.translate.instant('admin.sendPasswordResetSuccess'),
+                '',
+                { duration: 5000, panelClass: ['success-snackbar'] }
+              );
+            }
+          },
+          (err) => {
+            this.isSendingPasswordReset = false;
+            const errorMsg = this.mapPasswordResetError(err);
+            this.snackBar.open(
+              errorMsg,
+              '',
+              { duration: 7000, panelClass: ['error-snackbar'] }
+            );
+          }
+        );
+      }
+    });
+  }
+
+  private mapPasswordResetError(err: any): string {
+    const raw = typeof err === 'string' ? err : (err && (err.message || err.error || err)) || '';
+    const text = String(raw).toLowerCase();
+    
+    if (text.includes('forbidden') || text.includes('not authorized')) {
+      return this.translate.instant('admin.adminOnly');
+    }
+    if (text.includes('not found') || text.includes('user-not-found')) {
+      return this.translate.instant('admin.sendPasswordResetError') + ': ' + this.translate.instant('admin.unknown');
+    }
+    
+    return this.translate.instant('admin.sendPasswordResetError');
   }
 }

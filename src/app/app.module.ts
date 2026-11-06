@@ -39,6 +39,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MediasoupComponent } from './mediasoup/mediasoup.component';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { CliniciansComponent } from './clinicians/clinicians.component';
 import { I18nModule } from './i18n/i18n.module';
 import { NotFoundComponent } from './not-found/not-found.component';
@@ -86,6 +87,7 @@ registerLocaleData(localeTh);
     MatCheckboxModule,
     MatSlideToggleModule,
     MatTooltipModule,
+    MatSnackBarModule,
   ],
   providers: [
     { provide: MatPaginatorIntl, useClass: TranslatedMatPaginatorIntl },

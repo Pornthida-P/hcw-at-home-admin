@@ -2,6 +2,21 @@
 
 <div *ngIf="user">
     <app-user-form [user]="user" (submitted)="updateUser()" [error]="updateError"></app-user-form>
+    
+    <div style="margin-top: 20px; margin-bottom: 20px;">
+        <button 
+            mat-raised-button 
+            color="accent" 
+            (click)="sendPasswordReset()"
+            [disabled]="isSendingPasswordReset || !user.email"
+            [attr.aria-label]="'admin.sendPasswordReset' | translate">
+            <mat-icon>mail</mat-icon>
+            {{ (isSendingPasswordReset ? 'admin.sendPasswordResetInProgress' : 'admin.sendPasswordReset') | translate }}
+        </button>
+        <mat-hint *ngIf="!user.email" style="color: #999; margin-left: 10px;">
+            {{ 'admin.emailRequired' | translate }}
+        </mat-hint>
+    </div>
 </div>
 
 <h2>{{ 'admin.queueEdition' | translate }}</h2>

@@ -51,4 +51,9 @@ export class UserService {
   getUserQueuesById(userId) {
     return this.http.get(environment.api + `/user/${userId}/allowed-queues`);
   }
+
+  // Send password reset link to user (admin only)
+  sendPasswordReset(userId): Observable<{success: boolean}> {
+    return this.http.post<{success: boolean}>(environment.api + `/admin/send-password-reset/${userId}`, {});
+  }
 }
