@@ -1,10 +1,11 @@
 <h2>{{ 'admin.editUser' | translate }}</h2>
 
 <div *ngIf="user">
-    <app-user-form [user]="user" (change)="updateUser()"></app-user-form>
+    <app-user-form [user]="user" (submitted)="updateUser()" [error]="updateError"></app-user-form>
 </div>
 
 <h2>{{ 'admin.queueEdition' | translate }}</h2>
+<div *ngIf="error" class="error-message">{{ error }}</div>
 <div class="table-container" role="table" aria-label="Destinations">
     <div class="flex-table" role="rowgroup">
         <div  class="flex-row">

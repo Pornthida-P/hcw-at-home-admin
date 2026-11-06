@@ -4,7 +4,8 @@
 
 
     <mat-sidenav opened #sidenav mode="side" class="sidenav">
-      <div class="at">@ <span>{{ 'admin.home' | translate }}</span></div>
+      <div class="at">@ <span>{{ 'admin.home' | translate }}</span>
+      </div>
       <mat-list class="menu-list">
         <mat-list-item class="list-item">
           <button
@@ -36,7 +37,7 @@
             class="menu-btn"
             mat-button
           >
-            <mat-icon>supervised_user_circle</mat-icon>
+            <mat-icon>assignment_ind</mat-icon>
             <span class="btn-text">{{ 'admin.requester' | translate }}</span>
           </button>
         </mat-list-item>
@@ -64,6 +65,11 @@
           </button>
         </mat-list-item>
       </mat-list>
+      <div class="language-selector">
+        <mat-select [value]="currentLang" (selectionChange)="changeLanguage($event.value)" aria-label="Language">
+          <mat-option *ngFor="let lang of languages" [value]="lang.code">{{ lang.label }}</mat-option>
+        </mat-select>
+      </div>
     </mat-sidenav>
 
     <mat-sidenav-content>

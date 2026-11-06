@@ -1,3 +1,2 @@
 <h2>{{ 'admin.createUser' | translate }}</h2>
-<div *ngIf="error" class="error-message">{{ error | translate }}</div>
-<app-user-form [loading]="loading" (change)="createUser($event)"></app-user-form>
+<app-user-form (submitted)="createUser($event)" [loading]="loading" [error]="error"></app-user-form>

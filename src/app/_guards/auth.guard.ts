@@ -4,25 +4,16 @@ import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from
 import { AuthService } from '../auth/auth.service';
 
 @Injectable({ providedIn: 'root' })
-
 export class AuthGuard implements CanActivate {
-  constructor(
-    private router: Router,
-    private authService: AuthService
-  ) { }
-
-  private readonly allowedRoles = ['admin'];
+  constructor(private router: Router, private authService: AuthService) {}
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
     const currentUser = this.authService.currentUserValue;
 
-    if (currentUser && this.allowedRoles.includes(currentUser.role)) {
+    if (currentUser) {
       return true;
     }
-    if (currentUser && !this.allowedRoles.includes(currentUser.role)) {
-      this.authService.logout();
-      return false;
-    }
+
     this.router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
     return false;
   }

@@ -6,6 +6,7 @@ import { Router, ActivatedRoute, RouterStateSnapshot } from '@angular/router';
 import { first } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
+import { TranslateService } from '@ngx-translate/core';
 import { environment } from '../../environments/environment';
 import { AuthService } from '../auth/auth.service';
 /** Error when invalid control is dirty, touched, or submitted. */
@@ -57,7 +58,8 @@ export class LoginComponent implements OnInit, OnDestroy {
   constructor(
     private authService: AuthService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private translate: TranslateService
   ) {
 
   }
@@ -90,7 +92,8 @@ export class LoginComponent implements OnInit, OnDestroy {
               }, 1000);
             },
             (error) => {
-              this.error = error?.message === 'admin-only' ? 'admin.adminOnly' : (error?.error?.message || error?.message || error);
+              console.log('err')
+              this.error = this.getErrorMessage(error);
               this.loading = false;
             },
           ),
@@ -129,7 +132,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       this.loading = false;
 
       if (res.role && res.role != 'admin') {
-        this.error = "Vous devez être admin pour vous connecter";
+        this.error = this.translate.instant('admin.adminOnly');
         return;
       }
 
@@ -164,9 +167,20 @@ export class LoginComponent implements OnInit, OnDestroy {
 
     }, err => {
       this.loading = false;
-      this.error = err;
+      this.error = this.getErrorMessage(err);
     }));
   }
+
+  getErrorMessage(err) {
+    if (
+      (err && err.message === 'admin only') ||
+      (typeof err === 'string' && err.indexOf('cannot use this application') > -1)
+    ) {
+      return this.translate.instant('admin.adminOnly');
+    }
+    return err;
+  }
+
   ngOnDestroy(): void {
 
     this.subscriptions.forEach((subscription: Subscription) => {

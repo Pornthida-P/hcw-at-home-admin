@@ -6,6 +6,9 @@ import {MatTableDataSource} from '@angular/material/table';
 import {MatPaginator} from '@angular/material/paginator';
 import {Router} from '@angular/router';
 import {MatSlideToggleChange} from "@angular/material/slide-toggle";
+import {TranslateService} from '@ngx-translate/core';
+import {MatDialog} from '@angular/material/dialog';
+import {DialogBoxComponent} from '../dialog-box/dialog-box.component';
 
 @Component({
   selector: 'app-clinicians',
@@ -27,7 +30,12 @@ export class CliniciansComponent implements OnInit, OnDestroy {
   pageSizeOptions = ['10', '50', '100'];
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
-  constructor(private userService: UserService, private router: Router) {
+  constructor(
+    private userService: UserService,
+    private router: Router,
+    private translate: TranslateService,
+    public dialog: MatDialog
+  ) {
   }
 
   ngOnInit(): void {
@@ -42,7 +50,7 @@ export class CliniciansComponent implements OnInit, OnDestroy {
     this.subscriptions.push(
       this.userService.find({role: 'nurse'}).subscribe(
         (res) => {
-          this.users = res;
+          this.users = (res || []).map((user) => this.decodeUserFields(user));
           // this.count = res.totalCount;
           this.dataSource.data = this.users;
           this.loading = false;
@@ -106,17 +114,34 @@ export class CliniciansComponent implements OnInit, OnDestroy {
      this.getUsersByPage(this.pageSize, this.pageIndex);*/
   }
 
+  decodeUserFields(user: User): User {
+    const decoded: any = { ...user };
+    ['firstName', 'lastName', 'phoneNumber', 'organization', 'country'].forEach((field) => {
+      if (typeof decoded[field] === 'string' && decoded[field].indexOf('&') > -1) {
+        decoded[field] = new DOMParser().parseFromString(decoded[field], 'text/html').documentElement.textContent;
+      }
+    });
+    return decoded;
+  }
+
   deleteUser(user) {
-    if (confirm('Etes-vous sûr de vouloir supprimer cet utilisateur?')) {
-      this.userService.delete(user).subscribe(
-        (res) => {
-          this.getClinitians();
-        },
-        (err) => {
-          this.error = err;
-        }
-      );
-    }
+    const name = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email;
+    const dialogRef = this.dialog.open(DialogBoxComponent, {
+      width: '250px',
+      data: { action: 'Delete', name },
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result && result.event === 'Delete') {
+        this.userService.delete(user).subscribe(
+          (res) => {
+            this.getClinitians();
+          },
+          (err) => {
+            this.error = err;
+          }
+        );
+      }
+    });
   }
 
   /* useful for dynamic pagination getUsersByPage(limit, skip) {

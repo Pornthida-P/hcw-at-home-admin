@@ -7,14 +7,15 @@ import { LoginComponent } from './login/login.component';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
-import { HttpClientModule, HTTP_INTERCEPTORS, HttpClient } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { MatTableModule } from '@angular/material/table';
-import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatPaginatorModule, MatPaginatorIntl } from '@angular/material/paginator';
+import { TranslatedMatPaginatorIntl } from './i18n/mat-paginator-intl';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DashboardComponent } from './dashboard/dashboard.component';
@@ -37,13 +38,14 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MediasoupComponent } from './mediasoup/mediasoup.component';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { CliniciansComponent } from './clinicians/clinicians.component';
-import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
-import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { I18nModule } from './i18n/i18n.module';
+import { NotFoundComponent } from './not-found/not-found.component';
+import { registerLocaleData } from '@angular/common';
+import localeTh from '@angular/common/locales/th';
 
-export function HttpLoaderFactory(http: HttpClient) {
-  return new TranslateHttpLoader(http, '/assets/i18n/', '.json');
-}
+registerLocaleData(localeTh);
 
 @NgModule({
   declarations: [
@@ -59,9 +61,11 @@ export function HttpLoaderFactory(http: HttpClient) {
     QueuesComponent,
     DialogBoxComponent,
     MediasoupComponent,
+    NotFoundComponent,
   ],
   imports: [
     BrowserModule,
+    I18nModule,
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
@@ -81,16 +85,10 @@ export function HttpLoaderFactory(http: HttpClient) {
     MatDialogModule,
     MatCheckboxModule,
     MatSlideToggleModule,
-    TranslateModule.forRoot({
-      useDefaultLang: true,
-      loader: {
-        provide: TranslateLoader,
-        useFactory: HttpLoaderFactory,
-        deps: [HttpClient],
-      },
-    }),
+    MatTooltipModule,
   ],
   providers: [
+    { provide: MatPaginatorIntl, useClass: TranslatedMatPaginatorIntl },
     AuthService,
     {
       provide: HTTP_INTERCEPTORS,

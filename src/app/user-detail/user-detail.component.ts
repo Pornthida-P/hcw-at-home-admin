@@ -1,3 +1,4 @@
+import { TranslateService } from '@ngx-translate/core';
 import { QueueService } from './../queue.service';
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -18,6 +19,7 @@ export class UserDetailComponent implements OnInit {
   isAddingQueues = false;
   isRemovingQueues = false;
   error;
+  updateError = '';
   userId;
   allQueues: any[];
   allowedQueues: any;
@@ -27,7 +29,8 @@ export class UserDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private userService: UserService,
     private queueService: QueueService,
-    private location: Location
+    private location: Location,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -41,7 +44,7 @@ export class UserDetailComponent implements OnInit {
       },
       (err) => {
         this.loading = false;
-        this.error = err;
+        this.error = this.mapUserError(err);
       }
     );
     this.getUserQueues();
@@ -61,7 +64,7 @@ export class UserDetailComponent implements OnInit {
       },
       (err) => {
         this.loadingUserQueue = false;
-        this.error = err;
+        this.error = this.mapUserError(err);
       }
     );
   }
@@ -77,7 +80,7 @@ export class UserDetailComponent implements OnInit {
       },
       (err) => {
         this.loading = false;
-        this.error = err;
+        this.error = this.mapUserError(err);
       }
     );
   }
@@ -103,6 +106,7 @@ export class UserDetailComponent implements OnInit {
     if (!queuesToAdd || queuesToAdd.length == 0 || this.isAddingQueues) return;
     console.log(queuesToAdd);
     this.isAddingQueues = true;
+    this.error = '';
     this.userService.addDoctorToQueue(this.user.id, queuesToAdd).subscribe(
       (res) => {
         console.log(res);
@@ -112,6 +116,7 @@ export class UserDetailComponent implements OnInit {
       (err) => {
         console.log(err);
         this.isAddingQueues = false;
+        this.error = this.mapUserError(err);
       }
     );
   }
@@ -120,6 +125,7 @@ export class UserDetailComponent implements OnInit {
     let queuesToRemove = this.allowedQueues.filter((q) => q.checked).map((q) => q.id);
     if (!queuesToRemove || queuesToRemove.length == 0 || this.isRemovingQueues) return;
     this.isRemovingQueues = true;
+    this.error = '';
     this.userService.removeDoctorToQueue(this.user.id, queuesToRemove).subscribe(
       (res) => {
         console.log(res);
@@ -129,17 +135,31 @@ export class UserDetailComponent implements OnInit {
       (err) => {
         console.log(err);
         this.isRemovingQueues = false;
+        this.error = this.mapUserError(err);
       }
     );
   }
   updateUser() {
     console.log('userDetail', this.user);
+    this.updateError = '';
     this.userService.update(this.userId, this.user).subscribe(
       (res) => {
         console.log(res);
         this.location.back();
       },
-      (err) => console.log(err)
+      (err) => {
+        console.log(err);
+        this.updateError = this.mapUserError(err);
+      }
     );
+  }
+
+  private mapUserError(err: any): string {
+    const raw = typeof err === 'string' ? err : (err && (err.message || err.error || err)) || '';
+    const text = String(raw);
+    if (/email already/i.test(text) || /already in use/i.test(text) || /already used/i.test(text)) {
+      return this.translate.instant('admin.emailAlreadyUsed');
+    }
+    return text;
   }
 }

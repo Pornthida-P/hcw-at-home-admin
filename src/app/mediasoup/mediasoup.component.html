@@ -1,13 +1,16 @@
 <h2>
   {{ 'admin.mediasoup' | translate }}
 </h2>
+<p class="no-config-info" *ngIf="loaded && !configs.length">
+  {{ 'admin.mediasoupNoServers' | translate }}
+</p>
 <form [formGroup]="configForm">
   <div formArrayName="configs">
     <div *ngFor="let config of configs.controls; let i=index" [formGroupName]="i">
 
       <mat-form-field class="url-wrapper">
         <mat-label>{{ 'admin.url' | translate }}</mat-label>
-        <input matInput formControlName="url"  [errorStateMatcher]="matcher">
+        <input matInput formControlName="url" required [errorStateMatcher]="matcher">
         <mat-error *ngIf="config.controls['url']?.hasError('required')">
           {{ 'admin.urlRequired' | translate }}
         </mat-error>
@@ -18,7 +21,7 @@
 
       <mat-form-field>
         <mat-label>{{ 'admin.username' | translate }}</mat-label>
-        <input matInput formControlName="username"  [errorStateMatcher]="matcher">
+        <input matInput formControlName="username" required [errorStateMatcher]="matcher">
         <mat-error *ngIf="config.controls['username']?.hasError('required')">
           {{ 'admin.usernameRequired' | translate }}
         </mat-error>
@@ -26,24 +29,38 @@
 
       <mat-form-field>
         <mat-label>{{ 'admin.secret' | translate }}</mat-label>
-        <input matInput formControlName="password"  [errorStateMatcher]="matcher">
-        <mat-error *ngIf="configForm.controls['password']?.hasError('required')">
-          {{ 'admin.passwordRequired' | translate }}
+        <input matInput formControlName="password" required [errorStateMatcher]="matcher"
+               [type]="showSecret[i] ? 'text' : 'password'" autocomplete="new-password">
+        <button mat-icon-button matSuffix type="button" (click)="showSecret[i] = !showSecret[i]"
+                [attr.aria-label]="(showSecret[i] ? 'admin.hideSecret' : 'admin.showSecret') | translate"
+                [attr.aria-pressed]="!!showSecret[i]">
+          <mat-icon>{{ showSecret[i] ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        <mat-error *ngIf="config.controls['password']?.hasError('required')">
+          {{ 'admin.secretRequired' | translate }}
         </mat-error>
       </mat-form-field>
 
-      <mat-form-field>
+      <mat-form-field class="sessions-wrapper">
         <mat-label>{{ 'admin.numberOfSessions' | translate }}</mat-label>
-        <input type="number" matInput formControlName="maxNumberOfSessions"  [errorStateMatcher]="matcher">
-        <mat-error *ngIf="configForm.controls['maxNumberOfSessions']?.hasError('required')">
+        <input type="number" matInput formControlName="maxNumberOfSessions" required [errorStateMatcher]="matcher">
+        <mat-error *ngIf="config.controls['maxNumberOfSessions']?.hasError('required')">
           {{ 'admin.sessionsRequired' | translate }}
         </mat-error>
+        <mat-error *ngIf="config.controls['maxNumberOfSessions']?.hasError('min') || config.controls['maxNumberOfSessions']?.hasError('max')">
+          {{ 'admin.sessionsRange' | translate }}
+        </mat-error>
       </mat-form-field>
 
-      <mat-slide-toggle formControlName="active"></mat-slide-toggle>
+      <mat-slide-toggle formControlName="active" class="active-toggle" [aria-label]="'admin.mediasoupActive' | translate">
+        {{ 'admin.mediasoupActive' | translate }}
+      </mat-slide-toggle>
 
-      <button mat-button (click)="deleteConfig(i)">{{ 'admin.delete' | translate }}</button>
-      <button mat-raised-button (click)="save(i)" class="ml-10">{{ 'admin.save' | translate }}</button>
+      <button mat-button type="button" (click)="deleteConfig(i)" [disabled]="saving[i]">{{ 'admin.delete' | translate }}</button>
+      <button mat-raised-button (click)="save(i)" class="ml-10" [disabled]="saving[i]">{{ 'admin.save' | translate }}</button>
+      <button mat-button type="button" (click)="cancel(i)" class="ml-10" *ngIf="canCancel(i)" [disabled]="saving[i]">{{ 'admin.cancel' | translate }}</button>
+      <!-- Show why the save failed -->
+      <div class="save-error" *ngIf="saveErrors[i]">{{ saveErrors[i] | translate }}</div>
 
     </div>
   </div>
@@ -51,4 +68,3 @@
     <button mat-raised-button (click)="addConfig()">{{ 'admin.addNewConfig' | translate }}</button>
   </div>
 </form>
-
